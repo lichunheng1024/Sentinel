@@ -38,7 +38,7 @@ public class SimpleHttpHeartbeatSender implements HeartbeatSender {
 
     private static final String HEARTBEAT_PATH = "/registry/machine";
     private static final int OK_STATUS = 200;
-
+    //默认间隔时间为10秒
     private static final long DEFAULT_INTERVAL = 1000 * 10;
 
     private final HeartbeatMessage heartBeat = new HeartbeatMessage();
@@ -48,6 +48,7 @@ public class SimpleHttpHeartbeatSender implements HeartbeatSender {
 
     private int currentAddressIdx = 0;
 
+    //根据配置解析 配置的 sentinel-dashboard访问地址，主要用于上报
     public SimpleHttpHeartbeatSender() {
         // Retrieve the list of default addresses.
         List<InetSocketAddress> newAddrs = getDefaultConsoleIps();
@@ -55,17 +56,33 @@ public class SimpleHttpHeartbeatSender implements HeartbeatSender {
         this.addressList = newAddrs;
     }
 
+    /**
+     * 心跳检测具体执行逻辑
+     * @return
+     * @throws Exception
+     */
     @Override
     public boolean sendHeartbeat() throws Exception {
+        // 校验一下传输端口，这个端口就是在SimpleHttpCommandCenter中通过 new ServerSocket(port,backlog)
+        // 探测创建的服务器端socket (引入sentinel-core的业务应用)监听的port
         if (TransportConfig.getRuntimePort() <= 0) {
             RecordLog.info("[SimpleHttpHeartbeatSender] Runtime port not initialized, won't send heartbeat");
             return false;
         }
+        //获取dashboard 访问地址
         InetSocketAddress addr = getAvailableAddress();
         if (addr == null) {
             return false;
         }
-
+        /**
+         *  HEARTBEAT_PATH="/registry/machine"  ，这个endpoint是sentinel-dashboard 对外暴露出来的，
+         *  主要用于收集请求者的机器信息，包括：
+         *      1. sentinel的version
+         *      2. actually timestamp
+         *      3. 端口号（在解释一遍，这个端口号是 SimpleHttpCommandCenter中通过socket监听的形式对外暴露出来的一个端口号）
+         *         暴露出来的端口主要为了接收外部请求(sentinel-dashboard)请求的 httpCommand
+         *
+         */
         SimpleHttpRequest request = new SimpleHttpRequest(addr, HEARTBEAT_PATH);
         request.setParams(heartBeat.generateCurrentMessage());
         try {
@@ -95,9 +112,13 @@ public class SimpleHttpHeartbeatSender implements HeartbeatSender {
         return addressList.get(index);
     }
 
+    //获取sentinel-dashboard的地址
     private List<InetSocketAddress> getDefaultConsoleIps() {
         List<InetSocketAddress> newAddrs = new ArrayList<InetSocketAddress>();
         try {
+            //获取sentinel-dashboard 连接地址，
+            // 使用springCloud Alibaba 时，该地址配置在application.yml上
+            // spring.cloud.sentinel.transport.dashboard的值
             String ipsStr = TransportConfig.getConsoleServer();
             if (StringUtil.isEmpty(ipsStr)) {
                 RecordLog.warn("[SimpleHttpHeartbeatSender] Dashboard server address not configured");

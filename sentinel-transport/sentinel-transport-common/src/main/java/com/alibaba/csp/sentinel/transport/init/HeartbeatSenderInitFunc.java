@@ -39,25 +39,36 @@ public class HeartbeatSenderInitFunc implements InitFunc {
 
     private ScheduledExecutorService pool = null;
 
+    /**
+     *  初始化创建一个调度线程池
+     *      核心线程数为2，
+     *      守护线程
+     *      拒绝最先待处理的请求
+     *      DelayedWorkQueue-（BlockingQueue的一种）
+     */
     private void initSchedulerIfNeeded() {
         if (pool == null) {
             pool = new ScheduledThreadPoolExecutor(2,
-                new NamedThreadFactory("sentinel-heartbeat-send-task", true),
-                new DiscardOldestPolicy());
+                    new NamedThreadFactory("sentinel-heartbeat-send-task", true),
+                    new DiscardOldestPolicy());
         }
     }
 
     @Override
     public void init() {
+        //基于spi机制查询 com.alibaba.csp.sentinel.transport.HeartbeatSender
         HeartbeatSender sender = HeartbeatSenderProvider.getHeartbeatSender();
         if (sender == null) {
             RecordLog.warn("[HeartbeatSenderInitFunc] WARN: No HeartbeatSender loaded");
             return;
         }
-
+        //初始化创建一个调度线程池对象
         initSchedulerIfNeeded();
+        //获取执行调度任务时的间隔时间
         long interval = retrieveInterval(sender);
+        //将获取的interval值设置到 csp.sentinel.heartbeat.interval.ms
         setIntervalIfNotExists(interval);
+        //执行调度任务
         scheduleHeartbeatTask(sender, interval);
     }
 
@@ -68,21 +79,34 @@ public class HeartbeatSenderInitFunc implements InitFunc {
     private void setIntervalIfNotExists(long interval) {
         SentinelConfig.setConfig(TransportConfig.HEARTBEAT_INTERVAL_MS, String.valueOf(interval));
     }
-
+    /**
+     * 获取间隔时间
+     * 默认间隔时间是10秒，参考SimpleHttpHeartbeatSender.DEFAULT_INTERVAL
+     */
     long retrieveInterval(/*@NonNull*/ HeartbeatSender sender) {
         Long intervalInConfig = TransportConfig.getHeartbeatIntervalMs();
+        //验证是否合法
         if (isValidHeartbeatInterval(intervalInConfig)) {
             RecordLog.info("[HeartbeatSenderInitFunc] Using heartbeat interval "
-                + "in Sentinel config property: " + intervalInConfig);
+                    + "in Sentinel config property: " + intervalInConfig);
             return intervalInConfig;
         } else {
+            // 此处获取的是sentinel-transport-simple-http中的参考SimpleHttpHeartbeatSender 10毫秒
+            // 特别说明，通过源码可知，在netty中是5秒
             long senderInterval = sender.intervalMs();
             RecordLog.info("[HeartbeatSenderInit] Heartbeat interval not configured in "
-                + "config property or invalid, using sender default: " + senderInterval);
+                    + "config property or invalid, using sender default: " + senderInterval);
             return senderInterval;
         }
     }
 
+    /**
+     * 创建并执行在给定的初始延迟之后，随后以给定的时间段首先启用的周期性动作;
+     * 那就是执行将在initialDelay之后开始，然后是initialDelay+period ，然后是initialDelay + 2 * period ，等等。
+     *
+     * @param sender
+     * @param interval
+     */
     private void scheduleHeartbeatTask(/*@NonNull*/ final HeartbeatSender sender, /*@Valid*/ long interval) {
         pool.scheduleAtFixedRate(new Runnable() {
             @Override
@@ -95,6 +119,6 @@ public class HeartbeatSenderInitFunc implements InitFunc {
             }
         }, 5000, interval, TimeUnit.MILLISECONDS);
         RecordLog.info("[HeartbeatSenderInit] HeartbeatSender started: "
-            + sender.getClass().getCanonicalName());
+                + sender.getClass().getCanonicalName());
     }
 }

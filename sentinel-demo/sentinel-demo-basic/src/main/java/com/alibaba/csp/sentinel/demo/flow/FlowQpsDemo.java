@@ -21,6 +21,8 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.alibaba.csp.sentinel.context.Context;
+import com.alibaba.csp.sentinel.context.ContextUtil;
 import com.alibaba.csp.sentinel.util.TimeUtil;
 import com.alibaba.csp.sentinel.Entry;
 import com.alibaba.csp.sentinel.SphU;
@@ -65,7 +67,7 @@ public class FlowQpsDemo {
         // set limit qps to 20
         rule1.setCount(20);
         rule1.setGrade(RuleConstant.FLOW_GRADE_QPS);
-        rule1.setLimitApp("default");
+        rule1.setLimitApp("a,b");
         rules.add(rule1);
         FlowRuleManager.loadRules(rules);
     }
@@ -113,8 +115,8 @@ public class FlowQpsDemo {
 
                 System.out.println(seconds + " send qps is: " + oneSecondTotal);
                 System.out.println(TimeUtil.currentTimeMillis() + ", total:" + oneSecondTotal
-                    + ", pass:" + oneSecondPass
-                    + ", block:" + oneSecondBlock);
+                        + ", pass:" + oneSecondPass
+                        + ", block:" + oneSecondBlock);
 
                 if (seconds-- <= 0) {
                     stop = true;
@@ -124,7 +126,7 @@ public class FlowQpsDemo {
             long cost = System.currentTimeMillis() - start;
             System.out.println("time cost: " + cost + " ms");
             System.out.println("total:" + total.get() + ", pass:" + pass.get()
-                + ", block:" + block.get());
+                    + ", block:" + block.get());
             System.exit(0);
         }
     }
@@ -136,6 +138,8 @@ public class FlowQpsDemo {
                 Entry entry = null;
 
                 try {
+                    Context context = ContextUtil.enter("testDemo", "a,b");
+                    //System.out.println(context);
                     entry = SphU.entry(KEY);
                     // token acquired, means pass
                     pass.addAndGet(1);
@@ -148,6 +152,7 @@ public class FlowQpsDemo {
                     if (entry != null) {
                         entry.exit();
                     }
+                    ContextUtil.exit();
                 }
 
                 Random random2 = new Random();

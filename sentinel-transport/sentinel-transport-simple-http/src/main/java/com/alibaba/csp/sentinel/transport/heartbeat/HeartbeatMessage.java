@@ -35,6 +35,7 @@ public class HeartbeatMessage {
 
     private final Map<String, String> message = new HashMap<String, String>();
 
+    //在创建HeartbeatMessage时，增加如下参数
     public HeartbeatMessage() {
         message.put("hostname", HostNameUtil.getHostName());
         message.put("ip", TransportConfig.getHeartbeatClientIp());
