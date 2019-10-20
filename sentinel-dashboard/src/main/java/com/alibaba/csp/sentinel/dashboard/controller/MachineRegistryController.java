@@ -81,6 +81,7 @@ public class MachineRegistryController {
             machineInfo.setHeartbeatVersion(version);
             machineInfo.setLastHeartbeat(System.currentTimeMillis());
             machineInfo.setVersion(sentinelVersion);
+            //将机器信息注册到一个 ConcurrentHashMap 对象中
             appManagement.addMachine(machineInfo);
             return Result.ofSuccessMsg("success");
         } catch (Exception e) {

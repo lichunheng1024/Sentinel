@@ -17,7 +17,7 @@ package com.alibaba.csp.sentinel.slotchain;
 
 /**
  * The builder for processor slot chain.
- *
+ *com.alibaba.csp.sentinel.slotchain.SlotChainBuilder
  * @author qinan.qn
  * @author leyou
  * @author Eric Zhao

@@ -132,7 +132,7 @@ public interface Sph {
     /**
      * Create a protected resource.
      *
-     * @param name  the unique name for the protected resource
+     * @param name  the unique name for the protected resource  资源保护的唯一名称
      * @param type  the resource is an inbound or an outbound method. This is used
      *              to mark whether it can be blocked when the system is unstable
      * @param count the count that the resource requires

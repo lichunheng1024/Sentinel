@@ -24,12 +24,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.alibaba.csp.sentinel.dashboard.config.DashboardConfig;
 
+/**
+ * 应用信息实体类
+ */
 public class AppInfo {
 
     private String app = "";
 
     private Integer appType = 0;
-
+    /**
+     *  某个应用下的机器列表。
+     *   多实例部署
+     */
     private Set<MachineInfo> machines = ConcurrentHashMap.newKeySet();
 
     public AppInfo() {}

@@ -28,6 +28,7 @@ import com.alibaba.csp.sentinel.slots.statistic.StatisticSlotCallbackRegistry;
  */
 public class ParamFlowStatisticSlotCallbackInit implements InitFunc {
 
+    //此处的初始化动作，主要是为了说明，热点参数限流的rule通过或拒绝时应该执行的后续callback逻辑。
     @Override
     public void init() {
         StatisticSlotCallbackRegistry.addEntryCallback(ParamFlowStatisticEntryCallback.class.getName(),

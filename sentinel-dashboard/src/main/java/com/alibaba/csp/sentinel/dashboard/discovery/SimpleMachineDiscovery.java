@@ -37,6 +37,15 @@ public class SimpleMachineDiscovery implements MachineDiscovery {
     @Override
     public long addMachine(MachineInfo machineInfo) {
         AssertUtil.notNull(machineInfo, "machineInfo cannot be null");
+        /**
+         如果指定的键尚未与值相关联，则尝试使用给定的映射函数计算其值，
+         并将其输入到此映射中，除非null 。
+         整个方法调用是以原子方式执行的，因此每个键最多应用一次该函数。
+         在计算过程中可能会阻止其他线程对该映射进行的某些尝试更新操作，因此计算应该简单而简单，不得尝试更新此映射的任何其他映射。
+
+         machineInfo.getApp()。这里的app指的 客户端 project.name，来源-》sentinel-transport-simple-http中的HeartbeatMessage
+
+         */
         AppInfo appInfo = apps.computeIfAbsent(machineInfo.getApp(), o -> new AppInfo(machineInfo.getApp(), machineInfo.getAppType()));
         appInfo.addMachine(machineInfo);
         return 1;

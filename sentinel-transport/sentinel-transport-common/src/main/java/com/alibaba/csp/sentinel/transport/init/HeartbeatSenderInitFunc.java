@@ -62,7 +62,7 @@ public class HeartbeatSenderInitFunc implements InitFunc {
             RecordLog.warn("[HeartbeatSenderInitFunc] WARN: No HeartbeatSender loaded");
             return;
         }
-        //初始化创建一个调度线程池对象
+        //初始化创建一个全局调度线程池对象
         initSchedulerIfNeeded();
         //获取执行调度任务时的间隔时间
         long interval = retrieveInterval(sender);

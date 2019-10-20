@@ -23,6 +23,7 @@ import com.alibaba.csp.sentinel.util.StringUtil;
 public class MachineInfo implements Comparable<MachineInfo> {
 
     private String app = "";
+    // 应用类型
     private Integer appType = 0;
     private String hostname = "";
     private String ip = "";

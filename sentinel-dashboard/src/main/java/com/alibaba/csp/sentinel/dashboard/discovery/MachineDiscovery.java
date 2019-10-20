@@ -18,17 +18,35 @@ package com.alibaba.csp.sentinel.dashboard.discovery;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * 机器发现接口类
+ *  一个简易的服务注册中心
+ */
 public interface MachineDiscovery {
 
     String UNKNOWN_APP_NAME = "CLUSTER_NOT_STARTED";
 
+    /**
+     * 获取已注册的app名称
+     *
+     * @return
+     */
     List<String> getAppNames();
 
+    /**
+     * 获取简洁的appInfo 列表
+     */
     Set<AppInfo> getBriefApps();
 
+    /**
+     * 根据客户端应用名称(需要被保护的业务应用名称)，获取appInfo
+     * @param app
+     * @return
+     */
     AppInfo getDetailApp(String app);
 
     /**
+     * 根据应用名称，删除所有注册信息
      * Remove the given app from the application registry.
      *
      * @param app application name
@@ -36,9 +54,14 @@ public interface MachineDiscovery {
      */
     void removeApp(String app);
 
+    /**
+       新增一条机器注册信息
+     */
     long addMachine(MachineInfo machineInfo);
 
     /**
+     * 根据应用名称、客户端机器ip,客户端机器port 删除注册信息
+     *
      * Remove the given machine instance from the application registry.
      *
      * @param app the application name of the machine

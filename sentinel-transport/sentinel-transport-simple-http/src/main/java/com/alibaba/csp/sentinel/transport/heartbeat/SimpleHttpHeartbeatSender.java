@@ -18,7 +18,6 @@ package com.alibaba.csp.sentinel.transport.heartbeat;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.alibaba.csp.sentinel.log.RecordLog;
 import com.alibaba.csp.sentinel.transport.HeartbeatSender;
 import com.alibaba.csp.sentinel.transport.config.TransportConfig;
@@ -35,12 +34,16 @@ import com.alibaba.csp.sentinel.util.StringUtil;
  * @author leyou
  */
 public class SimpleHttpHeartbeatSender implements HeartbeatSender {
-
+    /**
+       该地址为sentinel-dashboard 暴露出来的用于机器注册的endpoint
+     */
     private static final String HEARTBEAT_PATH = "/registry/machine";
     private static final int OK_STATUS = 200;
     //默认间隔时间为10秒
     private static final long DEFAULT_INTERVAL = 1000 * 10;
-
+    /**
+     * 进行sendHeartbeat时传递的数消息对象封装
+     */
     private final HeartbeatMessage heartBeat = new HeartbeatMessage();
     private final SimpleHttpClient httpClient = new SimpleHttpClient();
 
@@ -85,14 +88,20 @@ public class SimpleHttpHeartbeatSender implements HeartbeatSender {
          */
         SimpleHttpRequest request = new SimpleHttpRequest(addr, HEARTBEAT_PATH);
         request.setParams(heartBeat.generateCurrentMessage());
+        SimpleHttpResponse response = null;
         try {
-            SimpleHttpResponse response = httpClient.post(request);
+            // 目前获取到的response 的statusCode是200还是其他，并没有实际用到，此处是否可以增加一个监控告警。
+            // 及response结果的输出
+            //通过httpclient发起http post请求，将自己的机器信息注册到sentinel-dashboard上
+            response = httpClient.post(request);
             if (response.getStatusCode() == OK_STATUS) {
                 return true;
             }
         } catch (Exception e) {
             RecordLog.warn("[SimpleHttpHeartbeatSender] Failed to send heartbeat to " + addr + " : ", e);
         }
+        //这一行是我自己加的一段输出日志
+        RecordLog.warn("[SimpleHttpHeartbeatSender] response status is not ok."+ (response!=null ? response.getStatusCode():""));
         return false;
     }
 

@@ -24,6 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+/**
+ * 应用管理类
+ */
 @Component
 public class AppManagement implements MachineDiscovery {
 
@@ -34,6 +37,7 @@ public class AppManagement implements MachineDiscovery {
 
     @PostConstruct
     public void init() {
+        //从应用上下文中获取 SimpleMachineDiscovery 一个具体的简易版服务注册发现类
         machineDiscovery = context.getBean(SimpleMachineDiscovery.class);
     }
 
