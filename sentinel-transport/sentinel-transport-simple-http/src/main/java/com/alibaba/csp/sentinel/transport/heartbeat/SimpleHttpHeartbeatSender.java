@@ -72,7 +72,10 @@ public class SimpleHttpHeartbeatSender implements HeartbeatSender {
             RecordLog.info("[SimpleHttpHeartbeatSender] Runtime port not initialized, won't send heartbeat");
             return false;
         }
-        //获取dashboard 访问地址
+        //获取dashboard 访问地址,
+        //注意：sentinel-dashboard也引入了sentinel-core ，且在main主入口处开启了InitExecutor.init()
+        // 但默认sentinel-dashboard并没有给自己在application.yml中配置自己的dashboard请求地址。
+        // 因此此处addr为null。不进行后续heartbeat的逻辑执行。
         InetSocketAddress addr = getAvailableAddress();
         if (addr == null) {
             return false;

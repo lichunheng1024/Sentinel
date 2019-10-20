@@ -159,6 +159,8 @@ public class SimpleHttpCommandCenter implements CommandCenter {
                 // 在springcloud alibaba sentinel中该端口默认是8719,通过该构造函数，尝试创建ServerSocket，
                 // 若创建失败，则说明当前port被占用了，通过tryCount++；与3进行取整 的方式，改变当前客户端对外监听的端口号，
                 // 从而根据计算后的值，进行探测创建ServerSocket，如 8720，8721，8722..
+                // 特别说明，在本地自己调试代码时，如果自己的业务应用和sentinel-dashboard都在本地部署，那么谁先启动谁先占用默认port 8719
+                // sentinel-dashboard 也引入了sentinel-core，且在DashboardApplication.java的main方法中启动了InitExecutor.init()
                 //backlog参数的解释，参考博客：https://www.cnblogs.com/qiumingcheng/p/9492962.html
                 ServerSocket server = new ServerSocket(basePort + tryCount / 3, 100);
                 /*
@@ -170,6 +172,7 @@ public class SimpleHttpCommandCenter implements CommandCenter {
                     在使用bind(SocketAddress)绑定套接字之前启用SO_REUSEADDR,即使先前的连接处于超时状态，也可以绑定套接字
                  */
                 server.setReuseAddress(true);
+                System.out.println("getServerSocketFromBasePort---->port="+basePort);
                 return server;
             } catch (IOException e) {
                 tryCount++;
