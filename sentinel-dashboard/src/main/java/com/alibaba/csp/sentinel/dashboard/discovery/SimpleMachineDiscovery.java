@@ -31,7 +31,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SimpleMachineDiscovery implements MachineDiscovery {
-
+    /**
+     * key: app--project.name
+     * value: appInfo
+     */
     private final ConcurrentMap<String, AppInfo> apps = new ConcurrentHashMap<>();
 
     @Override

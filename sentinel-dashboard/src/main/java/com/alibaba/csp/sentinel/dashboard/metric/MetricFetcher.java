@@ -18,6 +18,7 @@ package com.alibaba.csp.sentinel.dashboard.metric;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -71,13 +72,24 @@ public class MetricFetcher {
 
     public static final String NO_METRICS = "No metrics";
     private static final int HTTP_OK = 200;
+
+    /**
+     * 最大间隔时间 : 15秒
+     */
     private static final long MAX_LAST_FETCH_INTERVAL_MS = 1000 * 15;
+    /**
+     * 间隔时间 : 6秒
+     */
     private static final long FETCH_INTERVAL_SECOND = 6;
     private static final Charset DEFAULT_CHARSET = Charset.forName(SentinelConfig.charset());
     private final static String METRIC_URL_PATH = "metric";
     private static Logger logger = LoggerFactory.getLogger(MetricFetcher.class);
     private final long intervalSecond = 1;
-
+    /**
+     * app 最近获取Metric的一个map，
+     * key: 应用project.name
+     * value:lastFetchTime
+     */
     private Map<String, AtomicLong> appLastFetchTime = new ConcurrentHashMap<>();
 
     @Autowired
@@ -121,12 +133,17 @@ public class MetricFetcher {
             .setDefaultIOReactorConfig(ioConfig)
             .build();
         httpclient.start();
+        //开启定时调度任务
         start();
     }
 
+    /**
+     * sentinel-dashboard 服务启动后，该调度任务初始化延时10秒，之后每 1 秒执行 1 次
+     */
     private void start() {
         fetchScheduleService.scheduleAtFixedRate(() -> {
             try {
+                System.out.println("======【获取metric执行了】============="+ LocalDateTime.now().toLocalTime());
                 fetchAllApp();
             } catch (Exception e) {
                 logger.info("fetchAllApp error:", e);
@@ -154,6 +171,7 @@ public class MetricFetcher {
         if (apps == null) {
             return;
         }
+        //循环遍历，每次查询
         for (final String app : apps) {
             fetchService.submit(() -> {
                 try {
@@ -259,15 +277,23 @@ public class MetricFetcher {
     }
 
     private void doFetchAppMetric(final String app) {
+        //获取当前时间
         long now = System.currentTimeMillis();
+
+        //当前时间-最大间隔时间( 15000 ms )
         long lastFetchMs = now - MAX_LAST_FETCH_INTERVAL_MS;
+        //从最近发起过fetch的内存map中判断，当前的app是否存在其中
         if (appLastFetchTime.containsKey(app)) {
+            // 此处的 " + 1000 " 操作，是因为获取metric动作是每1秒执行一次
+            // 取最大值，是为了尽可能的获取最近时间的数据
             lastFetchMs = Math.max(lastFetchMs, appLastFetchTime.get(app).get() + 1000);
         }
         // trim milliseconds
         lastFetchMs = lastFetchMs / 1000 * 1000;
         long endTime = lastFetchMs + FETCH_INTERVAL_SECOND * 1000;
+        //定时调度是每1秒执行一次，但是如果endTime
         if (endTime > now - 1000 * 2) {
+            System.out.println("now()="+new Date(now).toLocaleString()+"-------------===========【不满足条件，不执行】================endTime="+new Date(endTime).toLocaleString());
             // to near
             return;
         }
@@ -276,9 +302,34 @@ public class MetricFetcher {
         final long finalLastFetchMs = lastFetchMs;
         final long finalEndTime = endTime;
         try {
+            /*
+
+            调用时机
+
+             now=2019-10-21 16:23:23
+                 xxx:port/metric?startTime=2019-10-21 16:23:15&endTime=2019-10-21 16:23:21
+
+             now=2019-10-21 16:23:30
+                 xxx:port/metric?startTime=2019-10-21 16:23:22&endTime=2019-10-21 16:23:28
+
+             now=2019-10-21 16:23:37
+                 xxx:port/metric?startTime=2019-10-21 16:23:29&endTime=2019-10-21 16:23:35
+
+             now=2019-10-21 16:23:44
+                xxx:port/metric?startTime=2019-10-21 16:23:36&endTime=2019-10-21 16:23:42
+
+             */
             // do real fetch async
             fetchWorker.submit(() -> {
                 try {
+                    System.out.println();
+                    System.out.println();
+                    System.out.println();
+                    System.out.println("now()="+new Date(now).toLocaleString()+"app="+app+"----finalLastFetchMs="+new Date(finalLastFetchMs).toLocaleString()+"-----finalEndTime="+new Date(finalEndTime).toLocaleString());
+                    System.out.println();
+                    System.out.println();
+                    System.out.println();
+
                     fetchOnce(app, finalLastFetchMs, finalEndTime, 5);
                 } catch (Exception e) {
                     logger.info("fetchOnce(" + app + ") error", e);
