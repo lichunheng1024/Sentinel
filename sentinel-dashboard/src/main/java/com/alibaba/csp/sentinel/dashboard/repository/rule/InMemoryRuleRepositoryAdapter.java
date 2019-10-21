@@ -41,6 +41,8 @@ public abstract class InMemoryRuleRepositoryAdapter<T extends RuleEntity> implem
 
     @Override
     public T save(T entity) {
+        // ？ 如果dashboard部署在多台机器上，那这个id将会有重复的可能性
+        // 目前还不支持 高可用
         if (entity.getId() == null) {
             entity.setId(nextId());
         }

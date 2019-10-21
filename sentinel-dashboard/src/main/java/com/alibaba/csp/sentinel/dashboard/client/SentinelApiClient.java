@@ -383,6 +383,7 @@ public class SentinelApiClient {
             Map<String, String> params = new HashMap<>(2);
             params.put("type", type);
             params.put("data", data);
+            //通过http请求，将sentinel-dashboard上创建的规则数据，传递到 『客户端』
             String result = executeCommand(app, ip, port, SET_RULES_PATH, params, true).get();
             logger.info("setRules: {}", result);
             return true;

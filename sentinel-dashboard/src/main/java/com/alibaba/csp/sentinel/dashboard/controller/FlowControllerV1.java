@@ -148,7 +148,7 @@ public class FlowControllerV1 {
     public Result<FlowRuleEntity> apiAddFlowRule(HttpServletRequest request, @RequestBody FlowRuleEntity entity) {
         AuthUser authUser = authService.getAuthUser(request);
         authUser.authTarget(entity.getApp(), PrivilegeType.WRITE_RULE);
-
+        //参数基本校验
         Result<FlowRuleEntity> checkResult = checkEntityInternal(entity);
         if (checkResult != null) {
             return checkResult;
@@ -160,6 +160,7 @@ public class FlowControllerV1 {
         entity.setLimitApp(entity.getLimitApp().trim());
         entity.setResource(entity.getResource().trim());
         try {
+            //控制台默认将规则存到内存map中。
             entity = repository.save(entity);
         } catch (Throwable throwable) {
             logger.error("Failed to add flow rule", throwable);
