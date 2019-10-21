@@ -38,6 +38,7 @@ import com.alibaba.fastjson.JSONArray;
 import static com.alibaba.csp.sentinel.transport.util.WritableDataSourceRegistry.*;
 
 /**
+ *  设置规则的Handler
  * @author jialiang.linjl
  * @author Eric Zhao
  */
@@ -61,7 +62,7 @@ public class ModifyRulesCommandHandler implements CommandHandler<String> {
         RecordLog.info(String.format("Receiving rule change (type: %s): %s", type, data));
 
         String result = "success";
-
+        //流控相关规则变动
         if (FLOW_RULE_TYPE.equalsIgnoreCase(type)) {
             List<FlowRule> flowRules = JSONArray.parseArray(data, FlowRule.class);
             FlowRuleManager.loadRules(flowRules);
@@ -69,21 +70,24 @@ public class ModifyRulesCommandHandler implements CommandHandler<String> {
                 result = WRITE_DS_FAILURE_MSG;
             }
             return CommandResponse.ofSuccess(result);
-        } else if (AUTHORITY_RULE_TYPE.equalsIgnoreCase(type)) {
+        }//黑白名单
+        else if (AUTHORITY_RULE_TYPE.equalsIgnoreCase(type)) {
             List<AuthorityRule> rules = JSONArray.parseArray(data, AuthorityRule.class);
             AuthorityRuleManager.loadRules(rules);
             if (!writeToDataSource(getAuthorityDataSource(), rules)) {
                 result = WRITE_DS_FAILURE_MSG;
             }
             return CommandResponse.ofSuccess(result);
-        } else if (DEGRADE_RULE_TYPE.equalsIgnoreCase(type)) {
+        }//降级
+        else if (DEGRADE_RULE_TYPE.equalsIgnoreCase(type)) {
             List<DegradeRule> rules = JSONArray.parseArray(data, DegradeRule.class);
             DegradeRuleManager.loadRules(rules);
             if (!writeToDataSource(getDegradeDataSource(), rules)) {
                 result = WRITE_DS_FAILURE_MSG;
             }
             return CommandResponse.ofSuccess(result);
-        } else if (SYSTEM_RULE_TYPE.equalsIgnoreCase(type)) {
+        }//系统负载保护
+        else if (SYSTEM_RULE_TYPE.equalsIgnoreCase(type)) {
             List<SystemRule> rules = JSONArray.parseArray(data, SystemRule.class);
             SystemRuleManager.loadRules(rules);
             if (!writeToDataSource(getSystemSource(), rules)) {
