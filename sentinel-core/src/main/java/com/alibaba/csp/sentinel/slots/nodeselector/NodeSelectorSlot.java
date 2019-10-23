@@ -121,6 +121,8 @@ import java.util.Map;
  *
  *  参考后羿的公众号文章分析： https://mp.weixin.qq.com/s/UEzwD22YC6jpp02foNSXnw
  *
+ *  负责收集资源的路径，并将这些资源的调用路径，以树状结构存储起来，用于根据调用路径来限流降级
+ *
  * @author jialiang.linjl
  * @see EntranceNode
  * @see ContextUtil

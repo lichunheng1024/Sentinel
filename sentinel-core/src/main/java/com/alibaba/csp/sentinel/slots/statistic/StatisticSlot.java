@@ -45,6 +45,9 @@ import com.alibaba.csp.sentinel.slots.block.BlockException;
  *
  * @author jialiang.linjl
  * @author Eric Zhao
+ *
+ * 用于记录，统计不同纬度的runtime 信息
+ *
  */
 public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
 

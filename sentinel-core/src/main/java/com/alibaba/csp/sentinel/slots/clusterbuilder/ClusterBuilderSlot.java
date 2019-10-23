@@ -43,6 +43,9 @@ import com.alibaba.csp.sentinel.slotchain.StringResourceWrapper;
  * </p>
  *
  * @author jialiang.linjl
+ *
+ * 则用于存储资源的统计信息以及调用者信息，例如该资源的RT，QPS，thread count 等，这些信息将用作为多维度限流，降级的依据。
+ *
  */
 public class ClusterBuilderSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
 

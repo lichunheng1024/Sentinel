@@ -50,6 +50,9 @@ public class ContextUtil {
     private static ThreadLocal<Context> contextHolder = new ThreadLocal<>();
 
     /**
+     * 存储根节点的map
+     *  key: context name
+     *  value: 根节点入口 entranceNode
      * Holds all {@link EntranceNode}. Each {@link EntranceNode} is associated with a distinct context name.
      */
     private static volatile Map<String, DefaultNode> contextNameNodeMap = new HashMap<>();
@@ -117,6 +120,13 @@ public class ContextUtil {
         return trueEnter(name, origin);
     }
 
+    /**
+     *
+     * @param name   the context name
+     * @param origin the origin of this invocation,usually the origin could be the Service Consumer's app name.
+     *               The origin is useful when we want to control different invoker/consumer separately.
+     * @return
+     */
     protected static Context trueEnter(String name, String origin) {
         Context context = contextHolder.get();
         if (context == null) {
@@ -135,6 +145,7 @@ public class ContextUtil {
                                 setNullContext();
                                 return NULL_CONTEXT;
                             } else {
+                                // new 一个 EntranceNode
                                 node = new EntranceNode(new StringResourceWrapper(name, EntryType.IN), null);
                                 // Add entrance node.
                                 Constants.ROOT.addChild(node);
@@ -150,6 +161,7 @@ public class ContextUtil {
                     }
                 }
             }
+            //创建一个新的context，并设置context的根节点entranceNode
             context = new Context(node, name);
             context.setOrigin(origin);
             contextHolder.set(context);

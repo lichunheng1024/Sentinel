@@ -19,6 +19,9 @@ import com.alibaba.csp.sentinel.eagleeye.EagleEye;
 import com.alibaba.csp.sentinel.eagleeye.StatLogger;
 import com.alibaba.csp.sentinel.log.LogBase;
 
+/**
+ * 鹰眼日志工具类，主要记录被block的日志信息到文件
+ */
 public class EagleEyeLogUtil {
 
     public static final String FILE_NAME = "sentinel-block.log";

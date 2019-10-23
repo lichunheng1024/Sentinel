@@ -26,6 +26,8 @@ import com.alibaba.csp.sentinel.slotchain.ResourceWrapper;
  *
  * @author jialiang.linjl
  * @author leyou
+ *
+ * 通过系统的状态，例如 load 1 等，来控制总的入口流量
  */
 public class SystemSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
 
