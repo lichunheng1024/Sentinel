@@ -20,6 +20,12 @@ import com.alibaba.csp.sentinel.slots.DefaultSlotChainBuilder;
 import java.util.ServiceLoader;
 
 /**
+ * slot：槽
+ *
+ *  xxxProvider 一般为通过一种spi机制加载读取一系列某接口
+ *  此类的spi是基于Java原生的ServiceLoader.load(xxx.class)来实现的。
+ *  查找 classpath下的 META-INF/services/com.alibaba.csp.sentinel.slotchain.SlotChainBuilder 文件内的配置数据
+ *
  * A provider for creating slot chains via resolved slot chain builder SPI.
  *
  * @author Eric Zhao
@@ -53,6 +59,11 @@ public final class SlotChainProvider {
 
     private static void resolveSlotChainBuilder() {
         for (SlotChainBuilder builder : LOADER) {
+            //以springcloudalibaba 0.0.9来看，配置com.alibaba.csp.sentinel.slotchain.SlotChainBuilder的有两处。
+            // sentinel-parameter-flow-control中配置了com.alibaba.csp.sentinel.slots.HotParamSlotChainBuilder
+            //以及 sentinel-core中的com.alibaba.csp.sentinel.slots.DefaultSlotChainBuilder
+            // 也可以根据自己的实际需求增加或调整校验链中slot的顺序
+            // 优先使用非默认的。
             if (builder.getClass() != DefaultSlotChainBuilder.class) {
                 slotChainBuilder = builder;
                 break;

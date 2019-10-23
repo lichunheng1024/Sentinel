@@ -49,6 +49,12 @@ public class AppController {
         return Result.ofSuccess(appManagement.getAppNames());
     }
 
+    /**
+     * 获取简洁版 客户端info信息
+     * 这些客户端info信息来自于 客户端通过heartbeat的方式注册到sentinel-dashboard上的应用
+     * @param request
+     * @return
+     */
     @GetMapping("/briefinfos.json")
     public Result<List<AppInfo>> queryAppInfos(HttpServletRequest request) {
         List<AppInfo> list = new ArrayList<>(appManagement.getBriefApps());
@@ -56,12 +62,19 @@ public class AppController {
         return Result.ofSuccess(list);
     }
 
+    /**
+     *  【簇点链路】查询调用
+     * @param app
+     * @return
+     */
     @GetMapping(value = "/{app}/machines.json")
     public Result<List<MachineInfoVo>> getMachinesByApp(@PathVariable("app") String app) {
+        //根据app  (project.name) 获取AppInfo信息
         AppInfo appInfo = appManagement.getDetailApp(app);
         if (appInfo == null) {
             return Result.ofSuccess(null);
         }
+        //获取这个project.name 下的所有机器列表
         List<MachineInfo> list = new ArrayList<>(appInfo.getMachines());
         Collections.sort(list, Comparator.comparing(MachineInfo::getApp).thenComparing(MachineInfo::getIp).thenComparingInt(MachineInfo::getPort));
         return Result.ofSuccess(MachineInfoVo.fromMachineInfoList(list));

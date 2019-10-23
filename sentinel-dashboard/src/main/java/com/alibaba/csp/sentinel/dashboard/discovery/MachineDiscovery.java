@@ -34,7 +34,7 @@ public interface MachineDiscovery {
     List<String> getAppNames();
 
     /**
-     * 获取简洁的appInfo 列表
+     * 获取注册到sentinel-dashboard上的简洁的 客户端appInfo 列表
      */
     Set<AppInfo> getBriefApps();
 

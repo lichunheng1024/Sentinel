@@ -118,6 +118,9 @@ import java.util.Map;
  * {@code curl http://localhost:8719/tree?type=root}
  * </p>
  *
+ *
+ *  参考后羿的公众号文章分析： https://mp.weixin.qq.com/s/UEzwD22YC6jpp02foNSXnw
+ *
  * @author jialiang.linjl
  * @see EntranceNode
  * @see ContextUtil

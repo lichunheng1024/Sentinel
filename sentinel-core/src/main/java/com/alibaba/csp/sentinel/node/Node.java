@@ -22,6 +22,8 @@ import com.alibaba.csp.sentinel.node.metric.MetricNode;
 import com.alibaba.csp.sentinel.slots.statistic.metric.DebugSupport;
 
 /**
+ *
+ * 为资源 存放实时 统计信息的抽象接口类
  * Holds real-time statistics for resources.
  *
  * @author qinan.qn
@@ -31,6 +33,7 @@ import com.alibaba.csp.sentinel.slots.statistic.metric.DebugSupport;
 public interface Node extends OccupySupport, DebugSupport {
 
     /**
+     * 获取 每一分钟到来的请求数量 ( 通过的 + 阻塞的 )
      * Get incoming request per minute ({@code pass + block}).
      *
      * @return total request count per minute
@@ -38,6 +41,8 @@ public interface Node extends OccupySupport, DebugSupport {
     long totalRequest();
 
     /**
+     *
+     * 获取每分钟通过数量
      * Get pass count per minute.
      *
      * @return total passed request count per minute

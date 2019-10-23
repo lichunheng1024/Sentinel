@@ -45,3 +45,8 @@
         return false;
     }
 ```
+
+3. sentinel客户端定义的如果是rest api 如，`/users/{userId}` 这种形式，在sentinel-dashboard中的簇点链路查询出来
+   将会是  `/users/1` ,  `/users/2`  , `/users/3` .. 之类的，将每一个参数都作为了一个唯一资源。
+#### 还没领悟的点
+> 1.  

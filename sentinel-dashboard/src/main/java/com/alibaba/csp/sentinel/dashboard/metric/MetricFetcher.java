@@ -105,11 +105,23 @@ public class MetricFetcher {
     private ExecutorService fetchService;
     private ExecutorService fetchWorker;
 
+    /**
+     * 该类上的注解是 @Component ,在这个MetricFetcher在实例化时，会执行这个无参构造函数。
+     * 在这个无参构造函数中，会执行对应的定时调度获取metric的调度任务
+     */
     public MetricFetcher() {
         int cores = Runtime.getRuntime().availableProcessors() * 2;
         long keepAliveTime = 0;
         int queueSize = 2048;
         RejectedExecutionHandler handler = new DiscardPolicy();
+        /**
+         * fetchService 这个线程池 的特点为：
+         *  假设当前机器的可用核心数是4，则cores=8
+         *  核心线程数8，最大线程数8，阻塞队列2048，拒绝策略是丢弃。
+         *  2048+8+8=2064，超过这些，对于单机的sentinel-dashboard就不能获取了。
+         *
+         *
+         */
         fetchService = new ThreadPoolExecutor(cores, cores,
             keepAliveTime, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(queueSize),
             new NamedThreadFactory("sentinel-dashboard-metrics-fetchService"), handler);
@@ -168,6 +180,7 @@ public class MetricFetcher {
      */
     private void fetchAllApp() {
         List<String> apps = appManagement.getAppNames();
+        //如果此时没有业务应用注册到 sentinel-dashboard 上，则这个apps是空的。
         if (apps == null) {
             return;
         }

@@ -132,7 +132,7 @@ public class CtSph implements Sph {
         if (!Constants.ON) {
             return new CtEntry(resourceWrapper, null, context);
         }
-
+        //组装slot chain
         ProcessorSlot<Object> chain = lookProcessChain(resourceWrapper);
 
         /*
