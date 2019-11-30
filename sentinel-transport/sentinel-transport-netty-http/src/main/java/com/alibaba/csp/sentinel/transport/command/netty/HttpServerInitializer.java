@@ -32,6 +32,11 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
         ChannelPipeline p = socketChannel.pipeline();
 
         p.addLast(new HttpRequestDecoder());
+        /**
+         *  当我们用POST方式请求服务器的时候，对应的参数信息是保存在message body中的,
+         *  如果只是单纯的用HttpServerCodec是无法完全的解析Http POST请求的，
+         *  因为HttpServerCodec只能获取uri中参数，所以需要加上HttpObjectAggregator.
+         */
         p.addLast(new HttpObjectAggregator(1024 * 1024));
         p.addLast(new HttpResponseEncoder());
 

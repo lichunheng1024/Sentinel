@@ -42,7 +42,7 @@ public class NettyHttpCommandCenter implements CommandCenter {
         new NamedThreadFactory("sentinel-netty-command-center-executor"));
 
     @Override
-    public void start() throws Exception {
+    public void start(){
         pool.submit(new Runnable() {
             @Override
             public void run() {

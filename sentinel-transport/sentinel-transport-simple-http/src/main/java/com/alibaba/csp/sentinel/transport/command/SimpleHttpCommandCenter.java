@@ -208,7 +208,9 @@ public class SimpleHttpCommandCenter implements CommandCenter {
         return handlerMap.keySet();
     }
 
-    //当前进程内启动一个线程，监听固定端口，如8019 (若被占用则递增探测)，来处理外部的请求
+    /**
+     * 当前进程内启动一个线程，监听固定端口，如8019 (若被占用则递增探测)，来处理外部的请求
+     */
     class ServerThread extends Thread {
 
         private ServerSocket serverSocket;
